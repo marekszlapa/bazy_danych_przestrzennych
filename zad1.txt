@@ -1,0 +1,233 @@
+--1.
+--CREATE DATABASE s304199
+--2.
+CREATE SCHEMA firma;
+--3.
+CREATE ROLE ksiegowosc;
+GRANT SELECT ON ALL TABLES IN SCHEMA firma TO ksiegowosc;
+--4.
+CREATE TABLE firma.pracownicy(
+	id_pracownika VARCHAR(7) NOT NULL,
+	imie VARCHAR(25),
+	nazwisko VARCHAR(40) NOT NULL,
+	adres VARCHAR(80) NOT NULL,
+	telefon VARCHAR(14)
+);
+ALTER TABLE firma.pracownicy ADD PRIMARY KEY (id_pracownika);
+COMMENT ON TABLE firma.pracownicy IS 'Pracownicy';
+CREATE INDEX pracownicy_index ON firma.pracownicy USING btree (id_pracownika);
+
+
+CREATE TABLE firma.godziny(
+	id_godziny VARCHAR(3) NOT NULL,
+	data DATE,
+	liczba_godzin SMALLINT,
+	id_pracownika VARCHAR(7)
+);
+ALTER TABLE firma.godziny ADD PRIMARY KEY (id_godziny);
+ALTER TABLE firma.godziny ADD FOREIGN KEY (id_pracownika) REFERENCES firma.pracownicy(id_pracownika);
+COMMENT ON TABLE firma.godziny IS 'Godziny';
+
+
+CREATE TABLE firma.pensja_stanowisko(
+	id_pensji VARCHAR(3) NOT NULL,
+	stanowisko VARCHAR(40),
+	kwota MONEY NOT NULL
+);
+ALTER TABLE firma.pensja_stanowisko ADD PRIMARY KEY (id_pensji);
+COMMENT ON TABLE firma.pensja_stanowisko IS 'Pensje';
+
+
+CREATE TABLE firma.premia(
+	id_premii VARCHAR(4) NOT NULL,
+	rodzaj VARCHAR(40),
+	kwota MONEY NOT NULL
+);
+ALTER TABLE firma.premia ADD PRIMARY KEY (id_premii);
+COMMENT ON TABLE firma.premia IS 'Premie';
+
+
+CREATE TABLE firma.wynagrodzenie(
+	id_wynagrodzenia INT NOT NULL,
+	data DATE,
+	id_pracownika VARCHAR(7),
+	id_godziny VARCHAR(3),
+	id_pensji VARCHAR(3),
+	id_premii VARCHAR(4)
+);
+ALTER TABLE firma.wynagrodzenie ADD PRIMARY KEY (id_wynagrodzenia);
+ALTER TABLE firma.wynagrodzenie ADD FOREIGN KEY (id_pracownika) REFERENCES firma.pracownicy(id_pracownika);
+ALTER TABLE firma.wynagrodzenie ADD FOREIGN KEY (id_godziny) REFERENCES firma.godziny(id_godziny);
+ALTER TABLE firma.wynagrodzenie ADD FOREIGN KEY (id_pensji) REFERENCES firma.pensja_stanowisko(id_pensji);
+ALTER TABLE firma.wynagrodzenie ADD FOREIGN KEY (id_premii) REFERENCES firma.premia(id_premii);
+COMMENT ON TABLE firma.wynagrodzenie IS 'Wynagrodzenia';
+
+
+
+
+--5.
+INSERT INTO firma.pracownicy VALUES 
+('w176453','Aleksandra','Wróblewska','Kraków ul. Wrocławska 273','+48576846574'),
+('w223434','Ignacy','Dębski','Kraków ul. Machośska 42','+48194362547'),
+('w335432','Melania','Pawłowska','Kraków ul. Kopia 32','+48928374617'),
+('w443452','Anna','Nowak','Kraków ul. Jutrzenki 232','+48483950382'),
+('w532324','Stanisław','Witkowski','Kraków ul. Pawia 76','+48576849382'),
+('w645434','Kinga','Morawska','Kraków ul. Solecka 65','+48574620578'),
+('w753345','Grzegorz','Włodarczyk','Kraków ul. Sądecka 43','+48928563746'),
+('w823423','Oliwia','Wrona','Kraków ul. Świeta 82','+48819364758'),
+('w954154','Joanna','Wiśniewska','Kraków ul. Bernarda 254','+48113432657'),
+('w105673','Alan','Wróbel','Kraków ul. Chrobrego 743','+48678445234');
+
+--SELECT * FROM firma.pracownicy;
+
+INSERT INTO firma.godziny VALUES 
+('h01','2020-05-10',99,'w176453'),
+('h02','2020-05-11',170,'w223434'),
+('h03','2020-05-12',185,'w335432'),
+('h04','2020-05-13',152,'w443452'),
+('h05','2020-05-14',142,'w532324'),
+('h06','2020-05-15',121,'w645434'),
+('h07','2020-05-16',99,'w753345'),
+('h08','2020-05-18',85,'w823423'),
+('h09','2020-05-19',167,'w954154'),
+('h10','2020-05-20',151,'w105673');
+
+--SELECT * FROM firma.godziny;
+
+INSERT INTO firma.pensja_stanowisko VALUES 
+('p01','Dyrektor',8000),
+('p02','Doradca',4200),
+('p03','Dyrektor finansów',6000),
+('p04','Urzędnik',3300),
+('p05','Sekretarka',2800),
+('p06','Sprzątaczka',900),
+('p07','Kucharka',2500),
+('p08','Kierownik',3000),
+('p09','Kierownik',4500),
+('p10','Stażysta',800);
+
+--SELECT * FROM firma.pensja_stanowisko;
+
+INSERT INTO firma.premia VALUES 
+('pr01','Brak',0),
+('pr02','Motywacyjna',500),
+('pr03','Za osiągnięcia',800),
+('pr04','Za innowacja',1100),
+('pr05','Za narażenie życia',1500),
+('pr06','Za wyjątkowe osiągnięcia',600),
+('pr07','Za pracę w weekendy',450),
+('pr08','Jubileuszowa',150),
+('pr09','Za pochwały',100),
+('pr10','Za nadgodziny',250);
+
+--SELECT * FROM firma.premia;
+
+INSERT INTO firma.wynagrodzenie VALUES
+(01,'2020-05-10','w176453','h01','p01','pr01'),
+(02,'2020-05-11','w223434','h02','p02','pr02'),
+(03,'2020-05-14','w335432','h03','p03','pr10'),
+(04,'2020-05-10','w443452','h04','p04','pr07'),
+(05,'2020-05-18','w532324','h05','p04','pr04'),
+(06,'2020-05-17','w645434','h06','p05','pr02'),
+(07,'2020-05-14','w753345','h07','p09','pr01'),
+(08,'2020-05-13','w823423','h08','p10','pr01'),
+(09,'2020-05-16','w954154','h09','p10','pr01'),
+(10,'2020-05-12','w105673','h10','p10','pr01');
+
+--SELECT * FROM firma.wynagrodzenie;
+
+--a)
+ALTER TABLE firma.godziny ADD COLUMN miesiac INT;
+ALTER TABLE firma.godziny ADD COLUMN tydzien INT;
+
+UPDATE firma.godziny SET miesiac = DATE_PART('month',data)
+UPDATE firma.godziny SET tydzien = DATE_PART('week',data)
+--SELECT * FROM firma.godziny;
+--b)
+ALTER TABLE firma.wynagrodzenie ALTER COLUMN data TYPE VARCHAR(10);
+--SELECT * FROM firma.wynagrodzenie;
+--c)
+--już wcześniej podczas insertowania ustawiłem jeden rodzaj na "brak"
+
+--6.
+--a)
+SELECT id_pracownika, nazwisko FROM firma.pracownicy;
+--b)
+SELECT wy.id_pracownika FROM firma.wynagrodzenie wy, firma.pensja_stanowisko pe 
+WHERE pe.id_pensji = wy.id_pensji AND pe.kwota > MONEY(1000);
+--c)
+SELECT wy.id_pracownika FROM firma.wynagrodzenie wy, firma.pensja_stanowisko pe, firma.premia pr
+WHERE pe.id_pensji = wy.id_pensji AND pr.id_premii = wy.id_premii AND pr.kwota = MONEY(0) AND pe.kwota > MONEY(2000);
+--d)
+SELECT * FROM firma.pracownicy
+WHERE imie LIKE 'J%';
+--e)
+SELECT * FROM firma.pracownicy
+WHERE nazwisko LIKE '%n%' AND imie LIKE '%a';
+--f)
+SELECT imie, nazwisko, liczba_godzin-160 AS nadgodziny FROM firma.pracownicy pr, firma.godziny god
+WHERE pr.id_pracownika = god.id_pracownika AND liczba_godzin > 160;
+--g)
+SELECT imie, nazwisko FROM firma.pracownicy pr, firma.pensja_stanowisko pe, firma.wynagrodzenie wy
+WHERE wy.id_pracownika = pr.id_pracownika AND wy.id_pensji = pe.id_pensji AND pe.kwota >= MONEY(1500) AND pe.kwota <= MONEY(3000);
+--h)
+SELECT imie, nazwisko, liczba_godzin-160 AS nadgodziny FROM firma.pracownicy pra, firma.godziny god, firma.premia pr, firma.wynagrodzenie wy
+WHERE wy.id_pracownika = pra.id_pracownika AND wy.id_godziny = god.id_godziny AND wy.id_premii = pr.id_premii AND liczba_godzin > 160 AND pr.kwota = MONEY(0);
+
+--7.
+--a)
+SELECT pr.id_pracownika, imie, nazwisko, kwota AS pensja FROM firma.pracownicy pr, firma.pensja_stanowisko pe, firma.wynagrodzenie wy
+WHERE wy.id_pensji = pe.id_pensji AND wy.id_pracownika = pr.id_pracownika
+ORDER BY pensja;
+--b)
+SELECT pra.id_pracownika, imie, nazwisko, pe.kwota AS pensja, pr.kwota AS premia FROM firma.pracownicy pra, firma.pensja_stanowisko pe, firma.wynagrodzenie wy, firma.premia pr 
+WHERE wy.id_pensji = pe.id_pensji AND wy.id_pracownika = pra.id_pracownika AND wy.id_premii = pr.id_premii
+ORDER BY pensja DESC, premia DESC;
+--c)
+SELECT COUNT(id_pracownika) AS ilosc_pracownikow, stanowisko FROM firma.pensja_stanowisko pe, firma.wynagrodzenie wy
+WHERE wy.id_pensji = pe.id_pensji
+GROUP BY stanowisko;
+--d)
+SELECT AVG(kwota::numeric)::money AS srednia_placa, MIN(kwota) AS minimalna_placa, MAX(kwota) AS maksymalna_placa FROM firma.pensja_stanowisko pe
+WHERE pe.stanowisko = 'Kierownik';
+--e)
+SELECT SUM(pe.kwota::numeric)::money + SUM(pr.kwota::numeric)::money AS suma_wynagrodzen FROM firma.wynagrodzenie wy, firma.pensja_stanowisko pe, firma.premia pr
+WHERE wy.id_pensji = pe.id_pensji AND wy.id_premii = pr.id_premii;
+--f)
+SELECT stanowisko, SUM(pe.kwota::numeric)::money + SUM(pr.kwota::numeric)::money AS suma_wynagrodzen FROM firma.wynagrodzenie wy, firma.pensja_stanowisko pe, firma.premia pr
+WHERE wy.id_pensji = pe.id_pensji AND wy.id_premii = pr.id_premii
+GROUP BY stanowisko;
+--g)
+SELECT stanowisko, COUNT(wy.id_premii) AS liczba_premii FROM firma.wynagrodzenie wy, firma.pensja_stanowisko pe, firma.premia pr
+WHERE wy.id_pensji = pe.id_pensji AND wy.id_premii = pr.id_premii AND pr.kwota != MONEY(0)
+GROUP BY stanowisko
+--h)
+--modyfikacja lub usunięcie na tabeli "pracownicy" narusza klucz obcy "godziny_id_pracownika_fkey" tabeli "godziny"
+--nie da się usunąć pracownikow z tabeli firma.pracownicy, ponieważ odnosi się do niej tabela firma.wynagrodzenie.
+--DELETE FROM firma.pracownicy pr USING firma.pensja_stanowisko pe, firma.wynagrodzenie wy
+--WHERE wy.id_pracownika =  pr.id_pracownika AND wy.id_pensji = pe.id_pensji AND pe.kwota < MONEY(1200);
+
+--da sie co najwyzej usunac wynagrodzenia z tabeli firma.wynagrodzenia, w którch kwota(pensja) < 1200zl
+DELETE FROM firma.wynagrodzenie wy USING firma.pensja_stanowisko pe 
+WHERE wy.id_pensji = pe.id_pensji AND pe.kwota < MONEY(1200)
+
+--8.
+--a)+48 było już dodane, więc dodaje same nawiasy
+UPDATE firma.pracownicy pr SET telefon = '(' || SUBSTRING(pr.telefon,1,3) || ')' || SUBSTRING(pr.telefon,4,9);
+--b)
+ALTER TABLE firma.pracownicy ALTER COLUMN telefon TYPE VARCHAR(16); --musiałem zwiększyć maksymalną liczbę znaków
+UPDATE firma.pracownicy pr SET telefon = SUBSTRING(pr.telefon,1,8) || '-' || SUBSTRING(pr.telefon,9,3) || '-' || SUBSTRING(pr.telefon,12,3)
+--c)
+SELECT id_pracownika, UPPER(imie) AS imie, UPPER(nazwisko) AS nazwisko, UPPER(adres) AS adres, telefon FROM firma.pracownicy pr
+WHERE LENGTH(nazwisko) = (SELECT MAX(LENGTH(nazwisko)) FROM firma.pracownicy)
+--d)
+SELECT pr.*, MD5(kwota::VARCHAR(40)) AS pensja FROM firma.pracownicy pr, firma.wynagrodzenie wy, firma.pensja_stanowisko pe
+WHERE wy.id_pracownika = pr.id_pracownika AND wy.id_pensji = pe.id_pensji;
+
+--9.
+SELECT CONCAT('Pracownik ', pra.imie, ' ', pra.nazwisko, ', w dniu ', SUBSTRING(wy.data::VARCHAR(15),9,2), '.', 
+SUBSTRING(wy.data::VARCHAR(15),6,2), '.', SUBSTRING(wy.data::VARCHAR(15),1,4),' otrzymał pensję całkowitą na kwotę ', (pe.kwota + pr.kwota),
+', gdzie wynagrodzenie zasadnicze wynosiło: ', pe.kwota, ', premia: ', pr.kwota, ', nadgodziny: ', 
+CASE WHEN god.liczba_godzin > 160 THEN god.liczba_godzin-160 ELSE 0 END) AS Raport
+FROM firma.wynagrodzenie wy, firma.pracownicy pra, firma.pensja_stanowisko pe, firma.premia pr, firma.godziny god
+WHERE wy.id_pracownika = pra.id_pracownika AND wy.id_godziny = god.id_godziny AND wy.id_pensji = pe.id_pensji AND wy.id_premii = pr.id_premii;
