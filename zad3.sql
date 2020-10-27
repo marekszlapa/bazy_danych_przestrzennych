@@ -1,11 +1,14 @@
 CREATE EXTENSION postgis;
 
 --4.
+SELECT COUNT(DISTINCT p.gid) AS "Liczba_budynków" FROM popp p, majrivers m
+WHERE p.f_codedesc = 'Building' AND ST_DWithin(p.geom, m.geom, 100000);
+
 CREATE TABLE tableB
 AS
-SELECT  COUNT(DISTINCT p.geom) AS "Liczba_budynków" FROM popp p, majrivers m
+SELECT DISTINCT p.gid, p.cat, p.f_codedesc, p.f_code, p.type, p.geom AS "Liczba_budynków" FROM popp p, majrivers m
 WHERE p.f_codedesc = 'Building' AND ST_DWithin(p.geom, m.geom, 100000);
---SELECT * FROM tableB;
+--SELECT * FROM tableB
 
 --5.
 CREATE TABLE airportsNew
