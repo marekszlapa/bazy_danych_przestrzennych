@@ -39,8 +39,9 @@ INSERT INTO obiekty VALUES
 (6,'obiekt6',ST_GeomFromText('GEOMETRYCOLLECTION(LINESTRING(1 1, 3 2),POINT(4 2))',0));
 --SELECT geometria FROM obiekty WHERE nazwa = 'obiekt6';
 
---2.
---zapytanie 1
+
+
+--1.
 SELECT ST_Area(ST_Buffer(ST_ShortestLine((SELECT geometria FROM obiekty WHERE nazwa = 'obiekt3'),(SELECT geometria FROM obiekty WHERE nazwa = 'obiekt4')),5));
 
 --2. Aby zamienić obiekt na poligon ostatni punkt linii musi byc identyczny jak pierwszy, żeby obiekt był zakmnięty.
